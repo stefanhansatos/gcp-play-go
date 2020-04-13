@@ -9,6 +9,8 @@ export GCP_REGION=$(gcloud config list --format="value(compute.region)")
 
 echo $GCP_REGION $GCP_PROJECT
 
+gcloud builds submit --tag gcr.io/$GCP_PROJECT/http-server
+
 ```bash
 gcloud builds submit --tag gcr.io/$GCP_PROJECT/ws-server
 ```

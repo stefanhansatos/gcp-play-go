@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 )
 
 func GetLocalIP() string {
@@ -23,16 +24,28 @@ func GetLocalIP() string {
 }
 
 func main() {
+
 	ipv4 := GetLocalIP()
-	fmt.Printf("ipv4: %s\n", ipv4)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	http.HandleFunc("/", HelloServer)
-	err := http.ListenAndServe(fmt.Sprintf("%s:8080", ipv4), nil)
+
+	fmt.Printf("start to listen and serve at %s:%s\n", ipv4, port)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", ipv4, port), nil)
 	if err != nil {
 		fmt.Printf("failed to listen and serve: %v\n", err)
 	}
 }
 
 func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World!\n")
+	fmt.Fprintf(w, "Hello from inside a Cloud Run container!\n\n")
+	fmt.Fprintf(w, "Here the current environment variables from inside the container:\n")
+
+	for index, value := range os.Environ() {
+		fmt.Fprintf(w, "%v:\t%s\n", index, value)
+	}
 }

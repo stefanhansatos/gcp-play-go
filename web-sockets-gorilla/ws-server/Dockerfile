@@ -8,17 +8,14 @@ RUN apk update \
 COPY . /go/src/app
 
 # Don't do this in production! Use vendoring instead.
-RUN go get -v app/server
+RUN go get -v app
 
-RUN go install app/server
+RUN go install app
 
 
 # STAGE 2: Deployment
 FROM alpine
 
-COPY --from=build /go/bin/server /go/bin/server
-
-EXPOSE 8080
-
+COPY --from=build /go/bin/app /go/bin/server
 
 ENTRYPOINT ["/go/bin/server"]
