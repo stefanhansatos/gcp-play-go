@@ -1,3 +1,8 @@
+### Intro
+
+We establish a "Hello World" HTTP server implemented in Go running 
+in a container in a managed Cloud Run service.
+
 ### Configuration
 
 Check current GCP configuration
@@ -11,7 +16,9 @@ export NAME=hello-world
 export GCP_PROJECT=$(gcloud config list --format="value(core.project)")
 export GCP_REGION=$(gcloud config list --format="value(compute.region)")
 
-echo "NAME: $NAME\nGCP_PROJECT: $GCP_PROJECT\nGCP_REGION: $GCP_REGION"
+echo "NAME: $NAME
+GCP_PROJECT: $GCP_PROJECT
+GCP_REGION: $GCP_REGION"
 ```
 ### Container
 
@@ -20,7 +27,7 @@ Create container image
 gcloud builds submit --tag gcr.io/${GCP_PROJECT}/${NAME}-server
 ```
 
-Deploy container to Cloud Run
+Deploy container as Cloud Run service
 ```bash
 gcloud run deploy ${NAME}-service \
   --image gcr.io/${GCP_PROJECT}/${NAME}-server \
@@ -69,3 +76,7 @@ curl <local IP address>
 e.g. 
 curl 192.168.1.132:8080
 ```
+
+### Cleansing
+
+
