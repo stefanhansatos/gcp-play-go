@@ -1,17 +1,17 @@
 ### Intro
 
-We establish a "Hello World" HTTP server implemented in Go running 
+We establish an "Hello World" HTTP server implemented in Go running 
 in a container in a managed Cloud Run service.
 
 ### Configuration
 
 Check current GCP configuration
-```bash
+```
 gcloud config list
 ```
 
 Set variables accordingly
-```bash
+```
 export NAME=ws-echo
 export GCP_PROJECT=$(gcloud config list --format="value(core.project)")
 export GCP_REGION=$(gcloud config list --format="value(compute.region)")
@@ -27,7 +27,7 @@ GCP_ZONE: $GCP_ZONE"
 
 Create compute engine with custom boot disk `play-go-debian` prepared for go deployment via git
 
-```bash
+```
 gcloud beta compute --project=$GCP_PROJECT instances create ${NAME}-instance \
   --zone=europe-west1-b \
   --machine-type=f1-micro \
@@ -45,7 +45,7 @@ gcloud beta compute --project=$GCP_PROJECT instances create ${NAME}-instance \
 ```
 
 Create firewall rule
-```bash
+```
 gcloud compute --project=aqueous-cargo-242610 firewall-rules create allow-http-8080 \
   --direction=INGRESS \
   --priority=1000 \
@@ -58,7 +58,7 @@ gcloud compute --project=aqueous-cargo-242610 firewall-rules create allow-http-8
 
 
 Connect via ssh to the instance
-```bash
+```
 cd go/src/github.com
 rm -rf *
 git clone https://github.com/stefanhansatos/gcp-play-go.git
@@ -71,7 +71,7 @@ go build
 ```
 
 Test the connection with the provided external IP of the instance
-```bash
+```
 wscat -c ws://<provided ip>:8080
 
 e.g.
@@ -84,14 +84,14 @@ Connected (press CTRL+C to quit)
 Stop the server and exit the instance.
 
 Stop the instance
-```bash
+```
 gcloud compute instances stop ${NAME}-instance \
   --zone=$GCP_ZONE
 ```
 
 
 Create a custom image
-```bash
+```
 gcloud compute images create ${NAME}-go-debian \
   --project=$GCP_PROJECT \
   --family=play-debian \
@@ -103,20 +103,20 @@ gcloud compute images create ${NAME}-go-debian \
 
 Add a startup script to the instance, i.e. add the custom metadata key `startup-script` 
 with the following value:
-```bash
+```
 #! /bin/bash
 
 sudo ${HOME}/go/src/github.com/gcp-play-go/web-sockets-gorilla/ws-server/ws-server
 ```
 
 Start the instance
-```bash
+```
 gcloud compute instances start ${NAME}-instance \
   --zone=$GCP_ZONE
 ```
 
 Test the connection with the provided external IP of the instance
-```bash
+```
 wscat -c ws://<provided ip>:8080
 
 e.g.
@@ -128,7 +128,7 @@ Connected (press CTRL+C to quit)
 
 
 Create an unmanaged instance group and add the newly created instance
-```bash
+```
 gcloud compute instance-groups unmanaged create ${NAME}-instance-group \
   --project=$GCP_PROJECT \
   --zone=$GCP_ZONE
@@ -165,7 +165,7 @@ gcloud compute forwarding-rules describe lb-ws-echo-forwarding-rule \
 ### Cleansing
 
 Delete load balancer 
-```bash
+```
 gcloud -q compute forwarding-rules delete lb-ws-echo-forwarding-rule --global
 gcloud -q compute target-http-proxies delete lb-ws-echo-target-proxy
 gcloud -q compute url-maps delete lb-ws-echo
@@ -174,7 +174,7 @@ gcloud -q compute health-checks delete ws-echo-healthcheck
 ```
 
 Delete instance group and instance
-```bash
+```
 gcloud -q compute instance-groups unmanaged describe ws-echo-instance-group
 
 gcloud -q compute instances stop ws-echo-instance
